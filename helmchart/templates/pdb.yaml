@@ -1,0 +1,14 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "tooling.labels" . | nindent 4 }}
+  annotations:
+    {{- include "tooling.annotations" . | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
