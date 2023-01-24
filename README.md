@@ -173,11 +173,6 @@ Uninstall the helm chart:
 helm uninstall tooling -n demo
 ```
 
-Remove PostgreSQL PersistentVolumeClaim:
-```shell
-kubectl delete pvc data-tooling-postgresql-0 -n demo
-```
-
 Stop minikube cluster:
 ```shell
 minikube stop
