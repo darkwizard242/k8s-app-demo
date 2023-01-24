@@ -1,0 +1,157 @@
+#########---- generic vars ----#########
+namespace: "demo"
+#########---- generic vars ----#########
+
+
+#########---- Default values for Kubernetes object: Service ----#########
+service:
+  type: "ClusterIP"
+  port: 80
+  targetPort: 80
+  protocol: "TCP"
+#########---- Default values for Kubernetes object: Service ----#########
+
+
+###########---- Default values for Kubernetes object: Deployment ----#########
+deployment:
+  securityContext:
+    fsGroup: 1020
+  replicas: 2
+  minReadySeconds: 10
+  strategyType: "RollingUpdate"
+  rollingUpdateMaxUnavailable: 1
+  rollingUpdateMaxSurge: 0
+  terminationGracePeriodSeconds: 60
+  topologySpreadConstraints:
+    maxSkew: 1
+    topologyKey: "kubernetes.io/hostname"
+    whenUnsatisfiable: "ScheduleAnyway"
+
+image:
+  repository: "local/tooling"
+  tag: "v1"
+  pullPolicy: "IfNotPresent"
+
+containers:
+  securityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 1020
+    runAsNonRoot: true
+    runAsUser: 1020
+  ports:
+    name: "http"
+    containerPort: 80
+    protocol: "TCP"
+  resources:
+    limits:
+      cpu: 200m
+      memory: "200Mi"
+    requests:
+      cpu: 50m
+      memory: "50Mi"
+
+readinessProbe:
+  path: /health/readiness
+  port: 80
+  scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  successThreshold: 2
+  failureThreshold: 2
+
+livenessProbe:
+  path: /health/liveness
+  port: 80
+  scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 2
+#########---- Default values for Kubernetes object: Deployment ----#########
+
+
+#########---- Default values for Kubernetes object: HorizontalPodAutoscaler (hpa) ----#########
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    cpuUtilizationPercentage: 80
+    # memoryUtilizationPercentage: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 0
+      policies:
+        type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        type: Pods
+        value: 3
+        periodSeconds: 60
+#########---- Default values for Kubernetes object: HorizontalPodAutoscaler (hpa) ----#########
+
+nameOverride: ""
+fullnameOverride: ""
+
+
+#########---- Default values for Kubernetes object: serviceAccount ----#########
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # name: "tooling"
+  automount: true
+#########---- Default values for Kubernetes object: serviceAccount ----#########
+
+
+#########---- MCaaS Network Policy ----#########
+networkPolicy:
+  enabled: true
+  ingress: {}
+#########---- MCaaS Istio Ingress Virtual Service & Destination ----#########
+
+
+
+
+#########---- Default disabled ingress ----#########
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+#########---- Default disabled ingress ----#########
+
+
+
+#########---- DEPENDENCY CHART: postgresql ----#########
+postgresql:
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        database: "sample-db"
+        username: "iamsuperuser"
+        password: "iamsupersecret"
+      service:
+        port: "5432"
+  primary:
+    persistence:
+      enabled: false
+  readReplicas:
+    persistence:
+      enabled: false
+#########---- DEPENDENCY CHART: postgresql ----#########

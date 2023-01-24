@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_USER=tooling
+        - APP_UUID=1020
+    image: local/tooling:v1
+    environment:
+      - DB_TYPE=postgresql
+      - DB_HOST=db
+      - DB_NAME=tooling
+      - DB_PORT=5432
+      - DB_USER=tool
+      - DB_PASS=iamsupersecret
+      - DB_SSL_MODE=prefer
+      - SECURE_PASSWORD_1=i-am-encoded-secret-1
+      - SECURE_PASSWORD_2=i-am-encoded-secret-2
+    restart: always
+    networks:
+      - tooling
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "curl", "-kv", "http://localhost/health/readiness"]
+      start_period: 5s
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:alpine3.16
+    environment:
+      - POSTGRES_DB=tooling
+      - POSTGRES_USER=tool
+      - POSTGRES_PASSWORD=iamsupersecret
+    restart: always
+    networks:
+      - tooling
+    ports:
+      - "5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+
+networks:
+  tooling:
+    driver: bridge

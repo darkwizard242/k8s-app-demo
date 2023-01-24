@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tooling
+description: Helm chart for Tooling API
+type: application
+version: 1.0.0
+dependencies:
+  - name: postgresql
+    version: "12.1.9"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

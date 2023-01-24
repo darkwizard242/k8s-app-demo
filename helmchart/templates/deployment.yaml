@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "tooling.labels" . | nindent 4 }}
+  annotations:
+    {{- include "tooling.annotations" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "tooling.selectorLabels" . | nindent 6 }}
+  {{- if not .Values.hpa.enabled }}
+  replicas: {{ .Values.deployment.replicas }}
+  {{- end }}
+  minReadySeconds: {{ .Values.deployment.minReadySeconds }}
+  strategy:
+    type: {{ .Values.deployment.strategyType }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.deployment.rollingUpdateMaxUnavailable }}
+      maxSurge: {{ .Values.deployment.rollingUpdateMaxSurge }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "tooling.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Name }}-sa
+      securityContext:
+        fsGroup: {{ .Values.deployment.securityContext.fsGroup }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      topologySpreadConstraints:
+      - maxSkew: {{ .Values.deployment.topologySpreadConstraints.maxSkew }}
+        topologyKey: {{ .Values.deployment.topologySpreadConstraints.topologyKey }}
+        whenUnsatisfiable: {{ .Values.deployment.topologySpreadConstraints.whenUnsatisfiable }}
+        labelSelector:
+          matchLabels:
+            {{- include "tooling.selectorLabels" . | nindent 14 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.containers.securityContext.allowPrivilegeEscalation }}
+            privileged: {{ .Values.containers.securityContext.privileged }}
+            readOnlyRootFilesystem: {{ .Values.containers.securityContext.readOnlyRootFilesystem }}
+            runAsGroup: {{ .Values.containers.securityContext.runAsGroup }}
+            runAsNonRoot: {{ .Values.containers.securityContext.runAsNonRoot }}
+            runAsUser: {{ .Values.containers.securityContext.runAsUser }}
+          env:
+          - name: DB_TYPE
+            value: "postgresql"
+          - name: DB_HOST
+            value: "{{ .Release.Name}}-postgresql.{{ .Values.namespace }}.svc.cluster.local"
+          - name: DB_NAME
+            value: {{ .Values.postgresql.global.postgresql.auth.database | quote }}
+          - name: DB_PORT
+            value: {{ .Values.postgresql.global.postgresql.service.port | quote }}
+          - name: DB_USER
+            value: {{ .Values.postgresql.global.postgresql.auth.username | quote }}
+          - name: DB_PASS
+            value: {{ .Values.postgresql.global.postgresql.auth.password | quote }}
+          - name: DB_SSL_MODE
+            value: "prefer"
+          - name: SECURE_PASSWORD_1
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets
+                key: secure-password-1
+          - name: SECURE_PASSWORD_2
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets
+                key: secure-password-2
+          ports:
+            - name: {{ .Values.containers.ports.name }}
+              containerPort: {{ .Values.containers.ports.containerPort }}
+              protocol: {{ .Values.containers.ports.protocol }}
+          resources:
+            {{- toYaml .Values.containers.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: {{ .Values.readinessProbe.port }}
+              scheme: {{ .Values.readinessProbe.scheme }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: {{ .Values.livenessProbe.port }}
+              scheme: {{ .Values.livenessProbe.scheme }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-hostname-path-connection-test"
+  labels:
+    {{- include "tooling.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+    "helm.sh/hook-weight": "2"
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['-q', '-O-', '{{ include "tooling.fullname" . }}:{{ .Values.service.port }}/private/hostname']
+  restartPolicy: Never
