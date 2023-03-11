@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt \
 
 COPY ./app /code/app
 RUN apk update \
+    && apk upgrade --no-cache \
     && apk add --no-cache curl \
     && mkdir -pv /code/app \
     && addgroup -g ${APP_GUID} ${APP_GROUP} \
