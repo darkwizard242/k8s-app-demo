@@ -40,9 +40,9 @@ containers:
     allowPrivilegeEscalation: false
     privileged: false
     readOnlyRootFilesystem: false
-    runAsGroup: 1020
+    runAsGroup: 10010
     runAsNonRoot: true
-    runAsUser: 1020
+    runAsUser: 10010
   ports:
     name: "http"
     containerPort: 80
