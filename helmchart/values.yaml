@@ -14,6 +14,7 @@ service:
 
 ###########---- Default values for Kubernetes object: Deployment ----#########
 deployment:
+  automountServiceAccountToken: false
   securityContext:
     fsGroup: 1020
   replicas: 2

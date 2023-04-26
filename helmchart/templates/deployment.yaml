@@ -30,6 +30,7 @@ spec:
         {{- include "tooling.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-sa
+      automountServiceAccountToken: {{ .Values.deployment.automountServiceAccountToken }}
       securityContext:
         fsGroup: {{ .Values.deployment.securityContext.fsGroup }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
