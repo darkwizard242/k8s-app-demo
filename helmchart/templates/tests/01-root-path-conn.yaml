@@ -10,6 +10,9 @@ metadata:
     "helm.sh/hook-weight": "1"
 spec:
   automountServiceAccountToken: false
+  securityContext:
+    seccompProfile:
+      type: DockerDefault
   containers:
     - name: wget
       image: busybox
