@@ -46,6 +46,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
+            seccompProfile:
+              type: {{ .Values.containers.securityContext.seccompProfile.type }}
             allowPrivilegeEscalation: {{ .Values.containers.securityContext.allowPrivilegeEscalation }}
             privileged: {{ .Values.containers.securityContext.privileged }}
             readOnlyRootFilesystem: {{ .Values.containers.securityContext.readOnlyRootFilesystem }}

@@ -35,6 +35,8 @@ image:
 
 containers:
   securityContext:
+    seccompProfile:
+      type: DockerDefault
     allowPrivilegeEscalation: false
     privileged: false
     readOnlyRootFilesystem: false
