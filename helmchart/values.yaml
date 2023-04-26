@@ -30,7 +30,7 @@ deployment:
 image:
   repository: "local/tooling"
   tag: "v1"
-  pullPolicy: "IfNotPresent"
+  pullPolicy: "Always"
 
 containers:
   securityContext:
