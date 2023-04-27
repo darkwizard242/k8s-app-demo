@@ -33,10 +33,10 @@ services:
         max-file: "5"
     healthcheck:
       test: ["CMD", "curl", "-kv", "http://localhost/health/readiness"]
-      start_period: 5s
+      start_period: 10s
       interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   db:
     image: postgres:alpine3.16
