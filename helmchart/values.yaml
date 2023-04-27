@@ -37,6 +37,11 @@ containers:
   securityContext:
     seccompProfile:
       type: DockerDefault
+    capabilities:
+      drop:
+        - NET_RAW
+      add:
+        - NET_BIND_SERVICE
     allowPrivilegeEscalation: false
     privileged: false
     readOnlyRootFilesystem: true

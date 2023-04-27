@@ -48,6 +48,15 @@ spec:
           securityContext:
             seccompProfile:
               type: {{ .Values.containers.securityContext.seccompProfile.type }}
+            capabilities:
+              drop:
+              {{- range .Values.containers.securityContext.capabilities.drop }}
+                - {{ . }}
+              {{- end }}
+              add:
+              {{- range .Values.containers.securityContext.capabilities.add }}
+                - {{ . }}
+              {{- end }}
             allowPrivilegeEscalation: {{ .Values.containers.securityContext.allowPrivilegeEscalation }}
             privileged: {{ .Values.containers.securityContext.privileged }}
             readOnlyRootFilesystem: {{ .Values.containers.securityContext.readOnlyRootFilesystem }}
