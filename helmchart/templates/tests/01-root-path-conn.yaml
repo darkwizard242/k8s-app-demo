@@ -13,7 +13,7 @@ spec:
   automountServiceAccountToken: false
   securityContext:
     seccompProfile:
-      type: DockerDefault
+      type: RuntimeDefault
   containers:
     - name: wget
       image: busybox
