@@ -36,7 +36,7 @@ image:
 containers:
   securityContext:
     seccompProfile:
-      type: DockerDefault
+      type: RuntimeDefault
     capabilities:
       drop:
         - NET_RAW
