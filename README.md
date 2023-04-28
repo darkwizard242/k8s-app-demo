@@ -108,6 +108,11 @@ For the purpose of this tutorial, we will release the helm chart against a speci
 kubectl create ns demo
 ```
 
+Add **bitnami** helm chart repository:
+```shell
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
 Pull dependent chart to disk:
 ```shell
 helm dependency build helmchart/
