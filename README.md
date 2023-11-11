@@ -145,10 +145,10 @@ By default, `ClusterIP` is used in this helm chart, which technically means that
 
 In order to access the application endpoints, `kubectl port-forward` can be used. It will allow connection/traffic to a local port to be forwarded to the port of the `Service` in the cluster for navigation/access purposes.
 
-The command below will setup port forwarding (`<HOST_PORT_80>:<SVC_PORT_80>`) on a local host port **80** to be forwarded to the `Service` port, which also is running on port **80**.
+The command below will setup port forwarding (`<HOST_PORT_8000>:<SVC_PORT_8000>`) on a local host port **8000** to be forwarded to the `Service` port, which also is running on port **8000**.
 
 ```shell
-kubectl port-forward svc/tooling 80:80 -n demo
+kubectl port-forward svc/tooling 8000:8000 -n demo
 ```
 
 Please note that `kubectl port-forward` process runs interactively (i.e. as a foreground process | use `CTRL+C` or `CMD+C` keys to end the process), so you may need to open another terminal session for any other activities.
@@ -194,37 +194,37 @@ minikube delete
 ##### GET Request (`/`):
 
 ```shell
-curl -i -H "Content-Type: text/html" -X GET http://localhost/
+curl -i -H "Content-Type: text/html" -X GET http://localhost:8000/
 ```
 
 ##### GET Request (`/private/hostname`):
 
 ```shell
-curl -i -H "Content-Type: application/json" -X GET http://localhost/private/hostname
+curl -i -H "Content-Type: application/json" -X GET http://localhost:8000/private/hostname
 ```
 
 ##### GET Request (`/health/liveness`):
 
 ```shell
-curl -i -H "Content-Type: application/json" -X GET http://localhost/health/liveness
+curl -i -H "Content-Type: application/json" -X GET http://localhost:8000/health/liveness
 ```
 
 ##### GET Request (`/health/readiness`):
 
 ```shell
-curl -i -H "Content-Type: application/json" -X GET http://localhost/health/readiness
+curl -i -H "Content-Type: application/json" -X GET http://localhost:8000/health/readiness
 ```
 
 ##### GET Request (`/secrets`):
 
 ```shell
-curl -i -H "Content-Type: application/json" -X GET http://localhost/secrets
+curl -i -H "Content-Type: application/json" -X GET http://localhost:8000/secrets
 ```
 
 ##### POST Request (`/publisher`):
 
 ```shell
-curl -i -d '{"text":"HTTP POST method testing"}' -H "Content-Type: application/json" -X POST http://localhost/publisher
+curl -i -d '{"text":"HTTP POST method testing"}' -H "Content-Type: application/json" -X POST http://localhost:8000/publisher
 ```
 
 ## License

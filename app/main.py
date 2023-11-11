@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from os import environ
+from socket import gethostbyname
 
 #### IMPORTS: DB ####
 import app.config.db as db_config
@@ -28,7 +29,7 @@ class Item(BaseModel):
 # Load & Intialize Logging
 # dictConfig(logging_config)
 # logger = logging.getLogger('api')
-# logger.info("Started Application. Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)")
+# logger.info("Started Application. Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)")
 
 # DATABASE #
 database = databases.Database(db_config.DB_URL)
@@ -59,6 +60,7 @@ async def shutdown():
 
 ## VARS ##
 ENV_HOSTNAME = environ.get('HOSTNAME')
+ENV_IP = gethostbyname(ENV_HOSTNAME)
 SECURE_PASSWORD_1 = environ.get('SECURE_PASSWORD_1')
 SECURE_PASSWORD_2 = environ.get('SECURE_PASSWORD_2')
 CUSTOM_HEADERS = {"X-App-Header": "k8s-app-demo", "Content-Language": "en-US", "Content-Type": "application/json"}
@@ -81,6 +83,12 @@ def home(request: Request):
 @api.api_route("/private/hostname", methods=["GET", "HEAD"])
 def hostname():
     content = {"hostname": ENV_HOSTNAME}
+    return JSONResponse(content=content, headers=CUSTOM_HEADERS)
+
+
+@api.api_route("/private/ip", methods=["GET", "HEAD"])
+def hostname():
+    content = {"ip": ENV_IP}
     return JSONResponse(content=content, headers=CUSTOM_HEADERS)
 
 
