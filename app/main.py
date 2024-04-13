@@ -43,6 +43,15 @@ templates = Jinja2Templates(directory="app/html")
 # TEMPLATING #
 
 
+## VARS ##
+ENV_HOSTNAME = environ.get('HOSTNAME', 'default-hostname-value')
+ENV_IP = gethostbyname(ENV_HOSTNAME)
+SECURE_PASSWORD_1 = environ.get('SECURE_PASSWORD_1', 'default-secure-password-1-value')
+SECURE_PASSWORD_2 = environ.get('SECURE_PASSWORD_2', 'default-secure-password-2-value')
+CUSTOM_HEADERS = {"X-App-Header": "k8s-app-demo", "Content-Language": "en-US", "Content-Type": "application/json"}
+USE_DATABASE = environ.get('USE_DATABASE', False)
+## VARS ##
+
 
 @api.on_event("startup")
 async def startup():
@@ -57,14 +66,6 @@ async def shutdown():
     if database.is_connected:
         await database.disconnect()
         print("INFO:\t  Disconnected from Database")
-
-## VARS ##
-ENV_HOSTNAME = environ.get('HOSTNAME')
-ENV_IP = gethostbyname(ENV_HOSTNAME)
-SECURE_PASSWORD_1 = environ.get('SECURE_PASSWORD_1')
-SECURE_PASSWORD_2 = environ.get('SECURE_PASSWORD_2')
-CUSTOM_HEADERS = {"X-App-Header": "k8s-app-demo", "Content-Language": "en-US", "Content-Type": "application/json"}
-## VARS ##
 
 
 # @api.api_route("/", methods=["GET", "HEAD"])
@@ -87,7 +88,7 @@ def hostname():
 
 
 @api.api_route("/private/ip", methods=["GET", "HEAD"])
-def hostname():
+def ip():
     content = {"ip": ENV_IP}
     return JSONResponse(content=content, headers=CUSTOM_HEADERS)
 
