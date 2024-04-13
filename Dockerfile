@@ -25,6 +25,6 @@ RUN apk update \
 WORKDIR /code
 USER ${APP_USER}
 EXPOSE 8000/tcp
-HEALTHCHECK --start-period=10s --interval=15s --timeout=5s --retries=3 CMD curl -kv http://localhost/health/readiness || exit 1
+HEALTHCHECK --start-period=10s --interval=15s --timeout=5s --retries=3 CMD curl -kv http://localhost:8000/health/readiness || exit 1
 
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000"]
