@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.12-alpine
 
 ARG APP_USER=${APP_USER:-tooling}
 ARG APP_UUID=${APP_UUID:-10010}
