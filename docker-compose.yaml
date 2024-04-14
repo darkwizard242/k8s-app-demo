@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         - APP_USER=tooling
-        - APP_UUID=1020
+        - APP_UUID=10010
     image: local/tooling:v1
     environment:
       - DB_TYPE=postgresql
