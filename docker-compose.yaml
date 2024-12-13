@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         - APP_USER=tooling
-        - APP_UUID=1020
+        - APP_UUID=10010
     image: local/tooling:v1
     environment:
       - DB_TYPE=postgresql
@@ -23,7 +23,7 @@ services:
     networks:
       - tooling
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
       - db
     logging:
@@ -32,11 +32,11 @@ services:
         max-size: "5m"
         max-file: "5"
     healthcheck:
-      test: ["CMD", "curl", "-kv", "http://localhost/health/readiness"]
-      start_period: 5s
+      test: ["CMD", "curl", "-kv", "http://localhost:8000/health/readiness"]
+      start_period: 10s
       interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   db:
     image: postgres:alpine3.16

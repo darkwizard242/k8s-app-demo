@@ -1,0 +1,52 @@
+block-list-secret-scan: []
+branch: master
+compact: true
+directory:
+- .
+download-external-modules: false
+enable-secret-scan-all-files: true
+evaluate-variables: true
+external-modules-download-path: .external_modules
+framework:
+- ansible
+# - argo_workflows
+# - arm
+# - azure_pipelines
+# - bicep
+# - bitbucket_pipelines
+# - circleci_pipelines
+# - cloudformation
+- dockerfile
+- github_configuration
+- github_actions
+# - gitlab_configuration
+# - gitlab_ci
+# - bitbucket_configuration
+- helm
+- json
+- yaml
+- kubernetes
+# - kustomize
+# - openapi
+# - sca_package
+# - sca_image
+- secrets
+# - serverless
+# - terraform
+# - terraform_json
+# - terraform_plan
+# - 3d_policy
+# - all
+mask: []
+# output:
+# - cli
+# - json
+# - junitxml
+# - csv
+# output-file-path: .
+output-baseline-as-skipped: true
+quiet: true
+secrets-history-timeout: 1h
+secrets-scan-file-type: []
+soft-fail: true
+summary-position: top

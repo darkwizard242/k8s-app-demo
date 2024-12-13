@@ -30,6 +30,7 @@ spec:
         {{- include "tooling.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-sa
+      automountServiceAccountToken: {{ .Values.deployment.automountServiceAccountToken }}
       securityContext:
         fsGroup: {{ .Values.deployment.securityContext.fsGroup }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
@@ -45,6 +46,17 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
+            seccompProfile:
+              type: {{ .Values.containers.securityContext.seccompProfile.type }}
+            capabilities:
+              drop:
+              {{- range .Values.containers.securityContext.capabilities.drop }}
+                - {{ . }}
+              {{- end }}
+              add:
+              {{- range .Values.containers.securityContext.capabilities.add }}
+                - {{ . }}
+              {{- end }}
             allowPrivilegeEscalation: {{ .Values.containers.securityContext.allowPrivilegeEscalation }}
             privileged: {{ .Values.containers.securityContext.privileged }}
             readOnlyRootFilesystem: {{ .Values.containers.securityContext.readOnlyRootFilesystem }}

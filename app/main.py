@@ -4,31 +4,21 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from os import environ
+from socket import gethostbyname
 
 #### IMPORTS: DB ####
 import app.config.db as db_config
 import databases
 import sqlalchemy
-#### IMPORTS: DB ####
-
-
-#### IMPORTS: Logging ####
-# import logging
-# from logging.config import dictConfig
-# from app.config.log import logging_config
-#### IMPORTS: Logging ####
 
 
 # Initialize API
 api = FastAPI()
 
+
 class Item(BaseModel):
     text: str
 
-# Load & Intialize Logging
-# dictConfig(logging_config)
-# logger = logging.getLogger('api')
-# logger.info("Started Application. Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)")
 
 # DATABASE #
 database = databases.Database(db_config.DB_URL)
@@ -42,35 +32,35 @@ templates = Jinja2Templates(directory="app/html")
 # TEMPLATING #
 
 
+## VARS ##
+USE_DATABASE = environ.get("USE_DATABASE", True)
+ENV_HOSTNAME = environ.get("HOSTNAME", "default-hostname-value")
+ENV_IP = gethostbyname(ENV_HOSTNAME)
+SECURE_PASSWORD_1 = environ.get("SECURE_PASSWORD_1", "default-secure-password-1-value")
+SECURE_PASSWORD_2 = environ.get("SECURE_PASSWORD_2", "default-secure-password-2-value")
+CUSTOM_HEADERS = {
+    "X-App-Header": "k8s-app-demo",
+    "Content-Language": "en-US",
+    "Content-Type": "application/json",
+}
+## VARS ##
+
 
 @api.on_event("startup")
 async def startup():
-    if not database.is_connected:
-        print("INFO:\t  Connecting to Database")
-        await database.connect()
-        print("INFO:\t  Connected to Database")
+    if USE_DATABASE is True:
+        if not database.is_connected:
+            print("INFO:\t   Connecting to Database")
+            await database.connect()
+            print("INFO:\t   Connected to Database")
 
 
 @api.on_event("shutdown")
 async def shutdown():
-    if database.is_connected:
-        await database.disconnect()
-        print("INFO:\t  Disconnected from Database")
-
-## VARS ##
-ENV_HOSTNAME = environ.get('HOSTNAME')
-SECURE_PASSWORD_1 = environ.get('SECURE_PASSWORD_1')
-SECURE_PASSWORD_2 = environ.get('SECURE_PASSWORD_2')
-CUSTOM_HEADERS = {"X-App-Header": "k8s-app-demo", "Content-Language": "en-US", "Content-Type": "application/json"}
-## VARS ##
-
-
-# @api.api_route("/", methods=["GET", "HEAD"])
-# def root():
-#     # logger.debug("Addressing request for: /")
-#     content = {"app-name": "tooling"}
-#     # logger.info("Sending response for: /")
-#     return JSONResponse(content=content, headers=CUSTOM_HEADERS)
+    if USE_DATABASE is True:
+        if database.is_connected:
+            await database.disconnect()
+            print("INFO:\t   Disconnected from Database")
 
 
 @api.get("/", response_class=HTMLResponse)
@@ -81,6 +71,18 @@ def home(request: Request):
 @api.api_route("/private/hostname", methods=["GET", "HEAD"])
 def hostname():
     content = {"hostname": ENV_HOSTNAME}
+    return JSONResponse(content=content, headers=CUSTOM_HEADERS)
+
+
+@api.api_route("/private/ip", methods=["GET", "HEAD"])
+def ip():
+    content = {"ip": ENV_IP}
+    return JSONResponse(content=content, headers=CUSTOM_HEADERS)
+
+
+@api.get("/private/db")
+def liveness():
+    content = {"is-db-used": USE_DATABASE}
     return JSONResponse(content=content, headers=CUSTOM_HEADERS)
 
 
@@ -98,7 +100,10 @@ def readiness():
 
 @api.get("/secrets")
 def readiness():
-    content = {"secure-password-1": SECURE_PASSWORD_1, "secure-password-2": SECURE_PASSWORD_2}
+    content = {
+        "secure-password-1": SECURE_PASSWORD_1,
+        "secure-password-2": SECURE_PASSWORD_2,
+    }
     return JSONResponse(content=content, headers=CUSTOM_HEADERS)
 
 
